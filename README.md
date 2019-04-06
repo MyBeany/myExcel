@@ -2,36 +2,30 @@
 
 #### 介绍
 基于jquery实现的web版excel。包含excel的基本功能
+1. 合并单元格，拆分单元格
+2. 插入单元格，删除单元格
+3. 整行整列选择单元格
+4. 自定义右键菜单，可以设置单元格数量
+5. 支持鼠标左键调整单元格宽高
+6. 支持选中单元格输入文字，设置字体，颜色，单元格背景色，水平位置，垂直位置，字体粗细，斜体，字体大小
+7. 单元格设置自动换行功能，默认为超出部分显示省略号
+8. 支持表结构修改的撤回功能（待完善）
+9. 单个单元格的样式复制
+10. 支持选中单元格，鼠标左键选中复制。复制支持有规律的数字计算（等差数列）
+11. 支持设置单元格线条样式，颜色
+12. 支持保存excel的HTML结构和将保存的excel结构代码展示出来继续编辑
 
 #### 软件架构
-软件架构说明
+使用jquery制作，其中使用了font-awesome作为字体图标
 
 
 #### 安装教程
 
-1. xxxx
-2. xxxx
-3. xxxx
+下载后直接打开index.html运行即可
 
-#### 使用说明
+#### 界面展示
 
-1. xxxx
-2. xxxx
-3. xxxx
-
-#### 参与贡献
-
-1. Fork 本仓库
-2. 新建 Feat_xxx 分支
-3. 提交代码
-4. 新建 Pull Request
-
-
-#### 码云特技
-
-1. 使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2. 码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3. 你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4. [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5. 码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6. 码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+![输入图片说明](https://gitee.com/uploads/images/2019/0406/145438_38e53dca_1325113.png "微信截图_20190406134820.png")
+![输入图片说明](https://gitee.com/uploads/images/2019/0406/145450_73e79354_1325113.png "微信截图_20190406134906.png")
+![输入图片说明](https://gitee.com/uploads/images/2019/0406/145500_f34493d1_1325113.png "微信截图_20190406135024.png")
+![输入图片说明](https://gitee.com/uploads/images/2019/0406/145509_c843888f_1325113.png "微信截图_20190406135056.png")
