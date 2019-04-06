@@ -27,5 +27,4 @@
 
 ![输入图片说明](https://gitee.com/uploads/images/2019/0406/145438_38e53dca_1325113.png "微信截图_20190406134820.png")
 ![输入图片说明](https://gitee.com/uploads/images/2019/0406/145450_73e79354_1325113.png "微信截图_20190406134906.png")
-![输入图片说明](https://gitee.com/uploads/images/2019/0406/145500_f34493d1_1325113.png "微信截图_20190406135024.png")
 ![输入图片说明](https://gitee.com/uploads/images/2019/0406/145509_c843888f_1325113.png "微信截图_20190406135056.png")
