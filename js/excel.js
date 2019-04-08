@@ -149,7 +149,6 @@
                             drugCell(table, t);
                             t.removeData("contentChange")
                         }
-                        // tdText(ele);
                         clearPositionCss(table);
                         var posi = getTdPosition(ele);
                         table.find("tr").find("td:eq(" + posi.col + ")").addClass("td-position-css");
@@ -169,26 +168,6 @@
                 table.find("td").removeClass("td-chosen-css");
                 selectTable(table, t, e)
             });
-        }
-
-        //设置table可以输入文字   使用可编辑div   暂时不用
-        function tdText(ele) {
-            if (ele.attr("readonly") == undefined) {
-                ele.attr("contenteditable", true);
-                if (window.getSelection) {
-                    ele[0].focus();
-                    var range = window.getSelection();
-                    if (range.focusOffset == 0) {
-                        range.selectAllChildren(ele[0]);
-                        range.collapseToEnd()
-                    }
-                } else if (document.selection) {
-                    var range = document.selection.createRange();
-                    range.moveToElementText(obj);
-                    range.collapse(false);
-                    range.select()
-                }
-            }
         }
 
         //赋值文本框   改变之后赋值到td内
@@ -546,12 +525,10 @@
             var rowHeightPanel = $("<div class='row-height-panel'></div>");
             var left = 0, top = 0;
             var firstTr = table.find("tr").first();
-            // table.find("td").removeAttr("contenteditable");
             colWidthPanel.insertBefore(table);
             rowHeightPanel.insertBefore(table);
             table.find("tr").first().find("td").each(function () {
                 left += this.offsetWidth;
-                var inds = $(this).closest("tr").find("td").index($(this));
                 let colWidthPanelItem = $("<div class='col-width-panel-item'></div>");
                 colWidthPanelItem.attr("draggable", true).mousedown(function (e) {
                     e.preventDefault && e.preventDefault();
@@ -611,9 +588,6 @@
                             upLeft = parseInt(ele.prev(".col-width-panel-item").css("left")) + 4
                         }
                         var nextLeft = table.width();
-                        if (ind < colWidthPanel.find(".col-width-panel-item").length - 1) {
-                            nextLeft = parseInt(ele.next(".col-width-panel-item").css("left")) + 4
-                        }
                         var now = table.find("tr").find("td:eq(" + ind + ")");
                         now.width(left - upLeft);
                         ele.css("left", left);
@@ -831,15 +805,6 @@
             }
         }
 
-        //阻止事件冒泡 不仅仅要stopPropagation，还要preventDefault
-        function pauseEvent(e) {
-            if (e.stopPropagation) e.stopPropagation();
-            if (e.preventDefault) e.preventDefault();
-            e.cancelBubble = true;
-            e.returnValue = false;
-            return false;
-        }
-
         function setSelectBorder(table, width, height, top, left) {
             var p = table.parent();
             var coll = table.find(".td-chosen-css");
@@ -1045,68 +1010,62 @@
 
         function setFontFamily() {
             let fontFamily = $(this).val();
-            if (selectTd !== undefined && selectTd !== {}) {
-                selectTd.css('font-family', fontFamily);
-            }
-
+            let coll = $('table').first().find('.td-chosen-css');
+            coll.css('font-family', fontFamily);
         }
 
         function setFontSize() {
             let fontSize = $(this).val();
-            if (selectTd !== undefined && selectTd !== {}) {
-                selectTd.css('font-size', fontSize);
-            }
+            let coll = $('table').first().find('.td-chosen-css');
+            coll.css('font-size', fontSize);
         }
 
         function setFontBold() {
             $(this).toggleClass("buttonBgColor");
-            if (selectTd !== undefined && selectTd !== {}) {
-                let fontWeight = selectTd.css('font-weight');
-                if (fontWeight === '400') {
-                    selectTd.css('font-weight', '700');
-                } else {
-                    selectTd.css('font-weight', '');
-                }
+            let coll = $('table').first().find('.td-chosen-css');
+            let fontWeight = selectTd.css('font-weight');
+            if (fontWeight === '400') {
+                coll.css('font-weight', '700');
+            } else {
+                coll.css('font-weight', '');
             }
         }
 
         function setFontItalic() {
             $(this).toggleClass("buttonBgColor");
-            if (selectTd !== undefined && selectTd !== {}) {
-                let fontItalic = selectTd.css('font-style');
-                if (fontItalic === 'normal') {
-                    selectTd.css('font-style', 'italic');
-                } else {
-                    selectTd.css('font-style', '');
-                }
+            let coll = $('table').first().find('.td-chosen-css');
+            let fontItalic = selectTd.css('font-style');
+            if (fontItalic === 'normal') {
+                coll.css('font-style', 'italic');
+            } else {
+                coll.css('font-style', '');
             }
         }
 
         function setUnderline() {
             $('.btn-strike').removeClass('buttonBgColor');
-            if (selectTd !== undefined && selectTd !== {}) {
-                let underline = selectTd.css('text-decoration-line');
-                if (underline === 'none' || underline === 'line-through') {
-                    selectTd.css('text-decoration-line', 'underline');
-                    $(this).addClass("buttonBgColor");
-                } else {
-                    selectTd.css('text-decoration-line', '');
-                    $(this).removeClass("buttonBgColor");
-                }
+            let coll = $('table').first().find('.td-chosen-css');
+            let underline = selectTd.css('text-decoration-line');
+            if (underline === 'none' || underline === 'line-through') {
+                coll.css('text-decoration-line', 'underline');
+                $(this).addClass("buttonBgColor");
+            } else {
+                coll.css('text-decoration-line', '');
+                $(this).removeClass("buttonBgColor");
             }
+
         }
 
         function setFontStrike() {
             $('.btn-underline').removeClass('buttonBgColor');
-            if (selectTd !== undefined && selectTd !== {}) {
-                let fontStrike = selectTd.css('text-decoration-line');
-                if (fontStrike === 'none' || fontStrike === 'underline') {
-                    selectTd.css('text-decoration-line', 'line-through');
-                    $(this).addClass("buttonBgColor");
-                } else {
-                    selectTd.css('text-decoration-line', '');
-                    $(this).removeClass("buttonBgColor");
-                }
+            let coll = $('table').first().find('.td-chosen-css');
+            let fontStrike = selectTd.css('text-decoration-line');
+            if (fontStrike === 'none' || fontStrike === 'underline') {
+                coll.css('text-decoration-line', 'line-through');
+                $(this).addClass("buttonBgColor");
+            } else {
+                coll.css('text-decoration-line', '');
+                $(this).removeClass("buttonBgColor");
             }
         }
 
@@ -1127,33 +1086,29 @@
         }
 
         function setBgColor() {
-            var color = $("#bgColorSelect").val();
-            if (selectTd !== undefined && selectTd !== {}) {
-                selectTd.css('background-color', color);
-            }
+            let color = $("#bgColorSelect").val();
+            let coll = $('table').first().find('.td-chosen-css');
+            coll.css('background-color', color);
         }
 
         function setFontColor() {
-            var color = $("#fontColorSelect").val();
-            if (selectTd !== undefined && selectTd !== {}) {
-                selectTd.css('color', color);
-            }
+            let color = $("#fontColorSelect").val();
+            let coll = $('table').first().find('.td-chosen-css');
+            coll.css('color', color);
         }
 
         function setValign(event) {
             $('.btn-av').removeClass('buttonBgColor');
             $(this).addClass("buttonBgColor");
-            if (selectTd !== undefined && selectTd !== {}) {
-                selectTd.attr("valign", event.data);
-            }
+            let coll = $('table').first().find('.td-chosen-css');
+            coll.attr("valign", event.data);
         }
 
         function setAlign(event) {
             $('.btn-ah').removeClass('buttonBgColor');
             $(this).addClass("buttonBgColor");
-            if (selectTd !== undefined && selectTd !== {}) {
-                selectTd.css("text-align", event.data);
-            }
+            let coll = $('table').first().find('.td-chosen-css');
+            coll.css("text-align", event.data);
         }
 
         function mergeBtn() {
@@ -1177,51 +1132,45 @@
             selectTd.toggleClass('whiteSpaceTrue')
         }
 
+        function getBorderCssStr() {
+            let color = $("#borderColor").val();
+            let style = $('.borderStyleOption option:selected').val();
+            return getBorderWidthByStyle(style) + style + ' ' + color;
+        }
+
         function setBorderLeft() {
-            var color = $("#borderColor").val();
-            let style = $('.borderStyleOption').val();
             if (selectTd !== undefined && selectTd !== {}) {
-                // selectTd.prev().css('border-right', '2px solid '+color)
-                selectTd.css('border-left', getBorderWidthByStyle(style) + style + ' ' + color)
+                selectTd.css('border-left', getBorderCssStr())
             }
         }
 
         function setBorderTop() {
-            var color = $("#borderColor").val();
-            let style = $('.borderStyleOption option:selected').val();
             if (selectTd !== undefined && selectTd !== {}) {
-                let index = selectTd.index();
-                // selectTd.parent().prev().children('td').eq(index).css('border-bottom', '2px solid' + color)
-                selectTd.css('border-top', getBorderWidthByStyle(style) + style + ' ' + color)
+                selectTd.css('border-top', getBorderCssStr())
             }
 
         }
 
         function setBorderRight() {
-            var color = $("#borderColor").val();
-            let style = $('.borderStyleOption option:selected').val();
             if (selectTd !== undefined && selectTd !== {}) {
-                selectTd.css('border-right', getBorderWidthByStyle(style) + style + ' ' + color)
+                selectTd.css('border-right', getBorderCssStr())
             }
 
         }
 
         function setBorderBottom() {
-            var color = $("#borderColor").val();
-            let style = $('.borderStyleOption option:selected').val();
             if (selectTd !== undefined && selectTd !== {}) {
-                selectTd.css('border-bottom', getBorderWidthByStyle(style) + style + ' ' + color)
+                selectTd.css('border-bottom', getBorderCssStr())
             }
         }
 
         function setBorderAll() {
             let coll = $('table').first().find('.td-chosen-css');
-            let color = $("#borderColor").val();
             let style = $('.borderStyleOption option:selected').val();
             if (style === 'none') {
                 coll.css('border', '#ccc 1px solid')
             } else {
-                coll.css('border', getBorderWidthByStyle(style) + style + ' ' + color)
+                coll.css('border', getBorderCssStr())
             }
         }
 
@@ -1230,10 +1179,8 @@
         }
 
         function setBorderColor() {
-            var color = $("#borderColor").val();
+            let color = $("#borderColor").val();
             if (selectTd !== undefined && selectTd !== {}) {
-                var selectTdBorderColor = selectTd.css('border-color');
-                let index = selectTd.index();
                 if (selectTd.css('border-right-color') !== 'rgb(204, 204, 204)') {
                     selectTd.css('border-right-color', color);
                 }
@@ -1257,33 +1204,6 @@
         function setBorderStyleOption(event) {
             let style = event.data;
             $('.borderStyleOption').val(style);
-            // borderStyleOptionChange();
-        }
-
-        function borderStyleOptionChange() {
-            let style = $('.borderStyleOption').val();
-            setBorderStyle(style);
-        }
-
-        function setBorderStyle(style) {
-            let color = $("#borderColor").val();
-            let width = getBorderWidthByStyle(style);
-            if (selectTd !== undefined && selectTd !== {}) {
-                let index = selectTd.index();
-                if (selectTd.css('border-right-color') !== 'rgb(204, 204, 204)') {
-                    selectTd.css('border-right', width + style + ' ' + color);
-                }
-                if (selectTd.css('border-top-color') !== 'rgb(204, 204, 204)') {
-                    selectTd.css('border-top', width + style + ' ' + color);
-                }
-                if (selectTd.css('border-bottom-color') !== 'rgb(204, 204, 204)') {
-                    console.log(width + style + ' ' + color)
-                    selectTd.css('border-bottom', width + style + ' ' + color);
-                }
-                if (selectTd.css('border-left-color') !== 'rgb(204, 204, 204)') {
-                    selectTd.css('border-left', width + style + ' ' + color);
-                }
-            }
         }
 
         function setCellWidth() {
