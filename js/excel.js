@@ -26,13 +26,14 @@
                     var clone = table.clone(false);
                     clone.find("tr:eq(0)").remove();
                     clone.find("tr").find("td:eq(0)").remove();
-                    clone.find("td").removeClass("td-position-css").removeClass("td-chosen-css").removeClass("td-chosen-muli-css").removeAttr("contenteditable");
+                    clone.find("td").removeClass("td-position-css").removeClass("td-chosen-css").removeClass("td-chosen-muli-css");
                     clone.find("td[class='']").removeAttr("class");
                     return clone.prop("outerHTML")
                 } else {
                     return ""
                 }
             }, setExcelHtml: function (html) {
+                initFun();
                 $(this).Excel({data: html})
             }
         });
@@ -65,7 +66,7 @@
             $('body').on('click', '.borderBottom', setBorderBottom);
             $('body').on('click', '.borderColor', clickBorderColor);
             $('body').on('click', '.borderStyle', showBorderStyleDiv);
-            $('body').on('change', '#borderColor', setBorderColor);
+            // $('body').on('change', '#borderColor', setBorderColor);
             $('body').on('change', '.cell-width', setCellWidth);
             $('body').on('change', '.cell-height', setCellHeight);
             $('body').on('click', '.borderAll', setBorderAll);
@@ -78,6 +79,7 @@
 
         function tableScroll() {
             var tableCont = document.querySelector('.excel');
+
             function scrollHandle(e) {
                 var scrollLeft = this.scrollLeft;
                 var scrollTop = this.scrollTop;
@@ -90,6 +92,7 @@
                 }
                 $(this).data('slt', {sl: scrollLeft, st: scrollTop});
             }
+
             tableCont.addEventListener('scroll', scrollHandle)
         }
 
@@ -122,9 +125,6 @@
             drawDrugArea(table);
             eventBind(table, t);
             drugCell(table, t);
-            table.mouseup(function () {
-                table.unbind('mouseover');
-            });
             //设置鼠标右键菜单的
             t.unbind("contextmenu");
             t.on('contextmenu', function () {
@@ -142,19 +142,13 @@
                 closeRightPanel(t);
                 var ele = $(e.target);
                 if (!ele.hasClass("drug-ele-td")) {
+                    clearPositionCss(table);
                     if (!ele.is("table") && table.data("beg-td-ele") && table.data("beg-td-ele").is(ele)) {
                         ele.addClass("td-chosen-css");
-                        table.find("td").removeAttr("contenteditable");
-                        if (t.data("contentChange") && t.data("contentChange") == "yes") {
-                            drugCell(table, t);
-                            t.removeData("contentChange")
-                        }
-                        clearPositionCss(table);
                         var posi = getTdPosition(ele);
                         table.find("tr").find("td:eq(" + posi.col + ")").addClass("td-position-css");
                         table.find("tr:eq(" + posi.row + ")").find("td").addClass("td-position-css")
                     } else {
-                        clearPositionCss(table);
                         getChosenList(table, getTdPosition(table.data("beg-td-ele")), getTdPosition(ele))
                     }
                     drawChosenArea(table, t)
@@ -173,9 +167,11 @@
         //赋值文本框   改变之后赋值到td内
         function setSelectTdValue(ele) {
             let val = $(ele).html();
-            $('#selectTdValue').focus();
-            $('#selectTdValue').val(val);
-            $('#selectTdValue').select();
+            let $input = $('#selectTdValue');
+            $input.val(val);
+            setTimeout(function () {
+                $input.select();
+            }, 10);
         }
 
         //赋值文本框  change事件
@@ -188,15 +184,12 @@
 
         //设置点击td时   赋值文本框的事件
         function settingInput(e) {
-            //将上一次值赋值
-            valueChange();
             setTimeout(function () {
-                $('#selectTdValue')[0].focus();
+                $('#selectTdValue').focus();
             }, 100);
-            selectTd = $(e.target);
-            let pos = getTdPosition($(e.target));
+            let pos = getTdPosition($(e));
             $('#coordinate').html('<span>' + getChar(pos.col - 1) + pos.row + "</span>")
-            setSelectTdValue(e.target);
+            setSelectTdValue(e);
         }
 
         //判断元素是否有某属性
@@ -215,7 +208,6 @@
             var first = coll.first();
             var posi = getTdPosition(first);
             var width = 0, height = 0;
-            var p = table.parent();
             coll.each(function () {
                 var p = getTdPosition($(this));
                 if (p.row == posi.row) {
@@ -237,7 +229,7 @@
         //点击td 设置样式栏中各项的值
         function triggerStyle(e, table) {
             $('.sub-bottom').children().removeClass('buttonBgColor');
-            let ele = $(e.target);
+            let ele = $(e);
             let fontFamily = ele.css('font-family');
             $('#fontfamily').val(fontFamily);
 
@@ -264,26 +256,24 @@
                 $('.btn-strike').addClass('buttonBgColor');
             }
 
-            let valign = ele.attr('valign');
+            let valign = ele.css('vertical-align');
+            $('.btn-av').removeClass('buttonBgColor');
             if (valign === 'top') {
                 $('.btn-htTop').addClass('buttonBgColor');
             } else if (valign === 'middle') {
                 $('.btn-htMiddle').addClass('buttonBgColor');
             } else if (valign === 'bottom') {
                 $('.btn-htBottom').addClass('buttonBgColor');
-            } else {
-                $('.btn-av').removeClass('buttonBgColor');
             }
 
             let textAlign = ele.css('text-align');
+            $('.btn-ah').removeClass('buttonBgColor');
             if (textAlign === 'left') {
                 $('.btn-htLeft').addClass('buttonBgColor');
             } else if (textAlign === 'center') {
                 $('.btn-htCenter').addClass('buttonBgColor');
             } else if (textAlign === 'right') {
                 $('.btn-htRight').addClass('buttonBgColor');
-            } else {
-                $('.btn-ah').removeClass('buttonBgColor');
             }
 
             let whiteSpace = ele.css('whiteSpace');
@@ -305,7 +295,7 @@
                 selectTd = $(e.target).next();
                 $(e.target).nextAll().each(function (index, ele) {
                     if ((!hasAttr($(this), 'colspan')) || index == 0) {
-                        $(this).addClass('td-chosen-css').addClass('td-chosen-muli-css').addClass('selectBorder');
+                        $(this).addClass('td-chosen-css').addClass('td-chosen-muli-css');
                     }
                 })
                 $(e.target).next().addClass('selectTd');
@@ -331,46 +321,126 @@
             selectWhole(table, addWidth, addHeight);
         }
 
+        function tdMousedown(e, table) {
+            selectTd = $(e);
+            table.find("td").removeClass("td-chosen-css");
+            table.removeData("beg-td-ele");
+            table.data("beg-td-ele", $(e));
+            $(e).addClass('selectTd');
+        }
+
+        function clickTd(e, table, t) {
+            table.find("td").removeClass('selectTd');
+            tdMousedown(e, table);
+            closeRightPanel(t);
+            clearPositionCss(table);
+            e.addClass("td-chosen-css");
+            var posi = getTdPosition(e);
+            table.find("tr").find("td:eq(" + posi.col + ")").addClass("td-position-css");
+            table.find("tr:eq(" + posi.row + ")").find("td").addClass("td-position-css")
+            drawChosenArea(table, t);
+            settingInput(e);
+            triggerStyle(e, table);
+        }
+
+        function selectTdScroll() {
+            let $node = $('.chosen-area-p-drug');
+            let windowH = $('.excel').height(),
+                windowW = $('.excel').width(),
+                $nodeOffsetH = parseInt($node.css('margin-top')),
+                $nodeOffsetW = parseInt($node.css('margin-left')),
+                $nodeInitLeft = selectTd.innerWidth() + selectTd.prevAll().last().innerWidth(),
+                $nodeInitTop = selectTd.innerHeight() + selectTd.parent().prevAll().last().innerHeight() - 2;
+            //备注  19为滚动条宽度
+            if (($nodeOffsetW + 19 >= windowW) && ($nodeOffsetW - $('.excel').scrollLeft() + 19 >= windowW)) {
+                $('.excel').scrollLeft(selectTd.width() + $('.excel').scrollLeft() + 4);
+            } else if ($nodeInitLeft + $('.excel').scrollLeft() > $nodeOffsetW) {
+                $('.excel').scrollLeft($('.excel').scrollLeft() - selectTd.width() - 4);
+            } else if (($nodeOffsetH + 19 >= windowH) && ($nodeOffsetH - $('.excel').scrollTop() + 19 >= windowH)) {
+                $('.excel').scrollTop(selectTd.height() + $('.excel').scrollTop() + 4);
+            } else if ($nodeInitTop + $('.excel').scrollTop() > $nodeOffsetH) {
+                $('.excel').scrollTop($('.excel').scrollTop() - selectTd.height() - 4);
+            }
+        }
+
+        function tableKeyDown(e, table, t) {
+            if (selectTd == undefined || $('.rightmouse-panel-div').length != 0) {
+                return;
+            }
+            let eCode = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+            if (e.ctrlKey && eCode === 90) {
+                chexiaoFunc(t)
+            } else if (eCode === 13 || eCode === 39) {
+                let $nextTd = selectTd.nextAll(':visible').first();
+                if ($nextTd.length > 0) {
+                    clickTd($nextTd, table, t);
+                }
+            } else if (eCode === 37) {
+                let $prevTd = selectTd.prevAll(':visible').first();
+                if ($prevTd.prev().length > 0) {
+                    clickTd($prevTd, table, t);
+                }
+            } else if (eCode === 40) {
+                let index = selectTd.index();
+                let $nextTd = {};
+                selectTd.parent().nextAll().each(function () {
+                    $nextTd = $(this).children().eq(index);
+                    if (!$nextTd.is(":hidden")) {
+                        return false;
+                    }
+                });
+                if ($nextTd.length > 0) {
+                    clickTd($nextTd, table, t);
+                }
+            } else if (eCode === 38) {
+                let index = selectTd.index();
+                let $prevTd = {};
+                selectTd.parent().prevAll().each(function () {
+                    $prevTd = $(this).children().eq(index);
+                    if (!$prevTd.is(":hidden")) {
+                        return false;
+                    }
+                });
+
+                let $prevTdPrev = $prevTd.parent().prev();
+                if ($prevTdPrev.length > 0) {
+                    clickTd($prevTd, table, t);
+                }
+            }
+            selectTdScroll();
+        }
+
         //为table绑定事件
         function eventBind(table, t) {
             table.mousedown(function (e) {
-                if (e.button != 2) {
+                if (e.button == 0) {
                     table.find("td").removeClass('selectTd');
                     if (!$(e.target).hasClass("drug-ele-td")) {
-                        table.find("td").removeClass("td-chosen-css");
-                        table.removeData("beg-td-ele");
-                        table.data("beg-td-ele", $(e.target));
-                        $(e.target).addClass('selectTd');
-                        settingInput(e);
-                        triggerStyle(e, table);
+                        tdMousedown(e.target, table);
+                        settingInput(e.target);
+                        triggerStyle(e.target, table);
                     } else {
                         selectMoreCell(e, table, t)
                     }
                     mouseMove(table, t);
                 }
             }).mouseup(function (e) {
+                table.unbind('mouseover');
                 selectTable(table, t, e);
             });
             $(document).unbind("keydown");
             $(document).keydown(function (e) {
-                if (e.ctrlKey && e.keyCode == 90) {
-                    chexiaoFunc(t)
-                }
+                tableKeyDown(e, table, t);
             });
-            table.find("td").keyup(function () {
-                t.data("contentChange", "yes")
-            })
         }
 
         function getChosenList(table, begPosi, endPosi) {
             if (begPosi != undefined && endPosi != undefined) {
-                var coll = [];
                 for (var i = (begPosi.row > endPosi.row ? endPosi.row : begPosi.row); i <= (begPosi.row > endPosi.row ? begPosi.row : endPosi.row); i++) {
                     var tr = table.find("tr:eq(" + i + ")");
                     for (var j = (begPosi.col > endPosi.col ? endPosi.col : begPosi.col); j <= (begPosi.col > endPosi.col ? begPosi.col : endPosi.col); j++) {
                         var td = tr.find("td:eq(" + j + ")");
                         td.addClass("td-chosen-css");
-                        coll[coll.length] = td
                     }
                 }
                 var coll = table.find(".td-chosen-css");
@@ -434,10 +504,6 @@
             }
         }
 
-        function getTdCell(table, row, col) {
-            return table.find("tr:eq(" + row + ")").find("td:eq(" + col + ")")
-        }
-
         function mergeCell(table) {
             if (table.length == 1) {
                 var coll = table.find(".td-chosen-css");
@@ -469,7 +535,7 @@
                         for (var i = posi.row; i <= (posi.row + (Number($(fir).attr("rowspan")) - 1)); i++) {
                             var tr = table.find("tr:eq(" + i + ")");
                             for (var j = posi.col; j <= (posi.col + (Number($(fir).attr("colspan")) - 1)); j++) {
-                                var td = tr.find("td:eq(" + j + ")").css("display", "");
+                                var td = tr.find("td:eq(" + j + ")").css("display", "").addClass("td-chosen-css");
                                 if (!td.is(fir)) {
                                     td.removeAttr("rowspan").removeAttr("colspan")
                                 }
@@ -483,12 +549,10 @@
 
         function getFatherCell(noneTd) {
             var table = noneTd.closest("table");
-            var p = getTdPosition(noneTd);
             var fatherCell = [];
             table.find("td[rowspan][colspan]").each(function () {
                 var posi = getTdPosition($(this));
                 var cell = $(this);
-                var coll = [];
                 var con = false;
                 for (var i = posi.row; i <= (posi.row + (Number($(this).attr("rowspan")) - 1)); i++) {
                     var tr = table.find("tr:eq(" + i + ")");
@@ -545,7 +609,6 @@
             });
             table.find("tr").each(function () {
                 top += this.offsetHeight;
-                var wdd = $(this).height();
                 $(this).height($(this).height());
                 let rowHeightPanelItem = $("<div class='row-height-panel-item'></div>");
                 rowHeightPanelItem.attr("draggable", true).mousedown(function (e) {
@@ -587,7 +650,6 @@
                         if (ind > 0) {
                             upLeft = parseInt(ele.prev(".col-width-panel-item").css("left")) + 4
                         }
-                        var nextLeft = table.width();
                         var now = table.find("tr").find("td:eq(" + ind + ")");
                         now.width(left - upLeft);
                         ele.css("left", left);
@@ -792,8 +854,8 @@
                             con = true
                         }
                         if (con) {
-                            if (fir.attr("valign") && fir.attr("valign") !== "") {
-                                coll.attr("valign", fir.attr("valign"))
+                            if (fir.css("vertical-align") && fir.css("vertical-align") !== "") {
+                                coll.css("vertical-align", fir.css("vertical-align"))
                             }
                             if (fir.css("text-align") && fir.css("text-align") !== "") {
                                 coll.css("text-align", fir.css("text-align"))
@@ -837,7 +899,7 @@
 
         //设置表头
         function drawDrugArea(table) {
-            $('.excel').append('<div class="tableLeftTop" id="coordinate"></div>')
+            table.parent().append('<div class="tableLeftTop" id="coordinate"></div>')
             var ind = 0;
             table.find("tr").first().addClass('thead')
             table.find("tr").first().find("td:gt(0)").unbind("click");
@@ -951,13 +1013,13 @@
                         coll.css("text-align", "right")
                     }
                     if (obj.hasClass("chuizhijuzhong")) {
-                        coll.attr("valign", "middle")
+                        coll.css("vertical-align", "middle")
                     }
                     if (obj.hasClass("dingduanduiqi")) {
-                        coll.attr("valign", "top")
+                        coll.css("vertical-align", "top")
                     }
                     if (obj.hasClass("dibuduiqi")) {
-                        coll.attr("valign", "bottom")
+                        coll.css("vertical-align", "bottom")
                     }
                     if (obj.hasClass("shangchayihang") || obj.hasClass("xiachayihang") || obj.hasClass("zuochayilie") || obj.hasClass("youchayilie") || obj.hasClass("shanchuhang") || obj.hasClass("shanchulie")) {
                         drugCell(table, t)
@@ -978,11 +1040,10 @@
             selectTdStyle = selectTd.prop("outerHTML");
         }
 
-        function pastedanyuange(table) {
+        function pastedanyuange() {
             selectTd.replaceWith(selectTdStyle);
             selectTd = $(selectTdStyle)
             setSelectTdValue(selectTd);
-
         }
 
         function chexiaoFunc(t) {
@@ -1101,7 +1162,7 @@
             $('.btn-av').removeClass('buttonBgColor');
             $(this).addClass("buttonBgColor");
             let coll = $('table').first().find('.td-chosen-css');
-            coll.attr("valign", event.data);
+            coll.css("vertical-align", event.data);
         }
 
         function setAlign(event) {
@@ -1129,7 +1190,13 @@
 
         function whiteSpace() {
             $(this).toggleClass('buttonBgColor');
-            selectTd.toggleClass('whiteSpaceTrue')
+            if (selectTd != null) {
+                if (selectTd.css('white-space') === 'nowrap') {
+                    selectTd.css('white-space', 'normal')
+                } else {
+                    selectTd.css('white-space', 'nowrap')
+                }
+            }
         }
 
         function getBorderCssStr() {
@@ -1139,29 +1206,81 @@
         }
 
         function setBorderLeft() {
-            if (selectTd !== undefined && selectTd !== {}) {
-                selectTd.css('border-left', getBorderCssStr())
-            }
+            let coll = $('table').first().find('.td-chosen-css');
+            let rowSpanNum = 0;
+            coll.parent().each(function (index) {
+                let $td = $(this).children('.td-chosen-css:visible').first();
+                if (index > 0) {
+                    let $tdrowspan = $td.attr('rowspan');
+                    let $parentTd = $td.parent().prev().children('.td-chosen-css[rowspan]');
+                    let rowspan = $parentTd.attr('rowspan');
+                    if (rowspan!= null && rowspan!== '' && rowspan!== 0) {
+                        rowSpanNum = rowspan;
+                    }
+                    if (rowSpanNum !== 0) {
+                        rowSpanNum--;
+                    }
+                    if (rowSpanNum === 0 ||($tdrowspan===undefined && $td.prev().css('display')!=='none')) {
+                        $td.css('border-left', getBorderCssStr());
+                    }
+                } else {
+                    $td.css('border-left', getBorderCssStr());
+                }
+            });
         }
 
         function setBorderTop() {
-            if (selectTd !== undefined && selectTd !== {}) {
-                selectTd.css('border-top', getBorderCssStr())
-            }
-
+            let coll = $('table').first().find('.td-chosen-css');
+            coll.parent().first().children('.td-chosen-css:visible').css('border-top', getBorderCssStr())
         }
 
         function setBorderRight() {
-            if (selectTd !== undefined && selectTd !== {}) {
-                selectTd.css('border-right', getBorderCssStr())
-            }
+            let coll = $('table').first().find('.td-chosen-css');
+            let rowSpanNum = 0;
+            coll.parent().each(function (index) {
+                let $td = $(this).children('.td-chosen-css:visible').last();
+                if (index > 0) {
+                    let $tdrowspan = $td.attr('rowspan');
+                    console.log($tdrowspan)
+                    let $parentTd = $td.parent().prev().children('.td-chosen-css[rowspan]');
+                    let rowspan = $parentTd.attr('rowspan');
+                    if (rowspan!= null && rowspan!== '' && rowspan!== 0) {
+                        rowSpanNum = rowspan;
+                    }
+                    if (rowSpanNum !== 0) {
+                        rowSpanNum--;
+                    }
+                    if (rowSpanNum === 0 ||($tdrowspan===null && $td.next().css('display')!=='none')) {
+                        $td.css('border-right', getBorderCssStr());
+                    }
+                } else {
+                    $td.css('border-right', getBorderCssStr());
+                }
+            });
+        }
 
+        //寻找td上面的第一个td
+        function findPrevShowTd($td) {
+            let $prevTd = $td.parent().prev().children().eq($td.index());
+            if($prevTd.css('display') === 'none'){
+                return findPrevShowTd($prevTd);
+            }else{
+                return $prevTd;
+            }
         }
 
         function setBorderBottom() {
-            if (selectTd !== undefined && selectTd !== {}) {
-                selectTd.css('border-bottom', getBorderCssStr())
-            }
+            let coll = $('table').first().find('.td-chosen-css');
+            let i = 0;
+            coll.parent().last().children('.td-chosen-css').each(function () {
+                console.log(i)
+                if($(this).css('display') === 'none' && i === 0){
+                    i = 1;
+                    findPrevShowTd($(this)).css('border-bottom', getBorderCssStr());
+                }else{
+                    $(this).css('border-bottom', getBorderCssStr())
+                }
+            })
         }
 
         function setBorderAll() {
@@ -1193,7 +1312,6 @@
                 if (selectTd.css('border-left-color') !== 'rgb(204, 204, 204)') {
                     selectTd.css('border-left-color', color);
                 }
-
             }
         }
 
