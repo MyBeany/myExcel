@@ -1,4 +1,4 @@
-﻿.excel-table {
+.excel-table {
     overflow: auto;
 }
 
@@ -45,13 +45,15 @@
 .col-width-panel div {
     width: 8px;
     position: absolute;
-    cursor: col-resize
+    cursor: col-resize;
+    z-index: 999;
 }
 
 .row-height-panel div {
     height: 8px;
     position: absolute;
-    cursor: row-resize
+    cursor: row-resize;
+    z-index: 999;
 }
 
 .drug-ele-td {
