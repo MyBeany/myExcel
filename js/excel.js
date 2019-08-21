@@ -86,9 +86,11 @@
                 var d = $(this).data('slt');
                 if (scrollLeft != (d == undefined ? 0 : d.sl)) {
                     $('.drug-ele-td-vertical').css('transform', 'translateX(' + scrollLeft + 'px)');
+                    $('.row-height-panel-item').css('transform', 'translateX(' + scrollLeft + 'px)');
                 }
                 if (scrollTop != (d == undefined ? 0 : d.st)) {
                     $('.drug-ele-td-horizontal').css('transform', 'translateY(' + scrollTop + 'px)');
+                    $('.col-width-panel-item').css('transform', 'translateY(' + scrollTop + 'px)');
                 }
                 $(this).data('slt', {sl: scrollLeft, st: scrollTop});
             }
@@ -592,7 +594,7 @@
             colWidthPanel.insertBefore(table);
             rowHeightPanel.insertBefore(table);
             table.find("tr").first().find("td").each(function () {
-                left += this.offsetWidth;
+                left = this.offsetLeft;
                 let colWidthPanelItem = $("<div class='col-width-panel-item'></div>");
                 colWidthPanelItem.attr("draggable", true).mousedown(function (e) {
                     e.preventDefault && e.preventDefault();
@@ -605,10 +607,10 @@
                     }
                 }).mouseup(function () {
                     clearDurgEle(table, t)
-                }).css("left", left - 4).css("height", firstTr[0].offsetHeight).appendTo(colWidthPanel)
+                }).css("left", left +this.offsetWidth - 4).css("height", firstTr[0].offsetHeight).appendTo(colWidthPanel)
             });
             table.find("tr").each(function () {
-                top += this.offsetHeight;
+                top = this.offsetTop;
                 $(this).height($(this).height());
                 let rowHeightPanelItem = $("<div class='row-height-panel-item'></div>");
                 rowHeightPanelItem.attr("draggable", true).mousedown(function (e) {
@@ -622,7 +624,7 @@
                     }
                 }).mouseup(function () {
                     clearDurgEle(table, t)
-                }).css("top", top - 4).css("width", firstTr.find("td")[0].offsetWidth).appendTo(rowHeightPanel)
+                }).css("top", top + this.offsetHeight - 4).css("width", firstTr.find("td")[0].offsetWidth).appendTo(rowHeightPanel)
             });
             colWidthPanel.find(".col-width-panel-item:first,.col-width-panel-item:last").css("display", "none");
             rowHeightPanel.find(".row-height-panel-item:first,.row-height-panel-item:last").css("display", "none");
@@ -652,7 +654,8 @@
                         }
                         var now = table.find("tr").find("td:eq(" + ind + ")");
                         now.width(left - upLeft);
-                        ele.css("left", left);
+                        //将负责调整宽度的元素加宽，以免出现鼠标滑动过快而导致调整失败
+                        ele.css("left", left-250).css("width",500);
                     }
                     if (ele.hasClass("row-height-panel-item") && ele.data("top") != undefined) {
                         var top = parseInt(ele.data("top")) + (e.clientY - ele.data("e-top"));
@@ -664,7 +667,7 @@
                         if (top - upTop > 5) {
                             var now = table.find("tr:eq(" + ind + ")");
                             now.height(top - upTop);
-                            ele.css("top", top)
+                            ele.css("top", top-250).css("height",500);
                         }
                     }
                 }
@@ -1241,7 +1244,6 @@
                 let $td = $(this).children('.td-chosen-css:visible').last();
                 if (index > 0) {
                     let $tdrowspan = $td.attr('rowspan');
-                    console.log($tdrowspan)
                     let $parentTd = $td.parent().prev().children('.td-chosen-css[rowspan]');
                     let rowspan = $parentTd.attr('rowspan');
                     if (rowspan!= null && rowspan!== '' && rowspan!== 0) {
@@ -1273,7 +1275,6 @@
             let coll = $('table').first().find('.td-chosen-css');
             let i = 0;
             coll.parent().last().children('.td-chosen-css').each(function () {
-                console.log(i)
                 if($(this).css('display') === 'none' && i === 0){
                     i = 1;
                     findPrevShowTd($(this)).css('border-bottom', getBorderCssStr());
@@ -1340,7 +1341,7 @@
                     let left = $(this).position().left
                     $(this).css('left', left + selectTd.width() - oldWidth);
                 })
-                updateBorderLeft(oldWidth, selectTd.innerWidth());
+                updateBorderLeft(oldWidth, selectTd.innerWidth);
             }
         }
 
