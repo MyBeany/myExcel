@@ -585,6 +585,7 @@
         }
 
         function drugCell(table, t) {
+            var colTransform = $('.col-width-panel-item').eq(1).css('transform');
             t.find(".col-width-panel,.row-height-panel").remove();
             t.find(".chosen-area-p").remove();
             var colWidthPanel = $("<div class='col-width-panel'></div>");
@@ -607,7 +608,7 @@
                     }
                 }).mouseup(function () {
                     clearDurgEle(table, t)
-                }).css("left", left +this.offsetWidth - 4).css("height", firstTr[0].offsetHeight).appendTo(colWidthPanel)
+                }).css("transform",colTransform).css("left", left +this.offsetWidth - 4).css("height", firstTr[0].offsetHeight).appendTo(colWidthPanel)
             });
             table.find("tr").each(function () {
                 top = this.offsetTop;
@@ -623,7 +624,7 @@
                         t.data("drug-ele", ele);
                     }
                 }).mouseup(function () {
-                    clearDurgEle(table, t)
+                    clearDurgEle(table, t);
                 }).css("top", top + this.offsetHeight - 4).css("width", firstTr.find("td")[0].offsetWidth).appendTo(rowHeightPanel)
             });
             colWidthPanel.find(".col-width-panel-item:first,.col-width-panel-item:last").css("display", "none");
@@ -640,7 +641,7 @@
                     }
                 }
             }).mouseup(function (e) {
-                clearDurgEle(table, t)
+                clearDurgEle(table, t);
             }).mousemove(function (e) {
                 if (t.data("drug-ele") != undefined) {
                     closeRightPanel(t);
